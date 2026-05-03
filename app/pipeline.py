@@ -58,12 +58,19 @@ def extract_signals(interviews: str, jira: str, analytics: str) -> List[SignalIt
         List of SignalItem objects
     """
     system_prompt = (
-        "You are a product intelligence analyst. Extract every distinct user pain point, "
-        "feature request, and usage behavior signal from the following product management inputs. "
-        "Return ONLY a valid JSON array. Each element must have exactly these fields: "
-        "type (pain, request, or behavior), description (one sentence), "
-        "source (interviews, jira, or analytics), intensity (integer 1-5 where 5 is most severe). "
-        "Do not include any text outside the JSON array."
+        "SYSTEM INSTRUCTION: You are a senior product manager analyzing user research. You MUST extract meaningful signals from the data. Do NOT return empty lists.\n\n"
+        "CRITICAL REQUIREMENTS:\n"
+        "1. You MUST return valid JSON - no markdown, no code blocks, no explanations\n"
+        "2. The response MUST be a JSON array with at least 5 signal objects\n"
+        "3. Each object MUST have ALL these fields:\n"
+        "   - type: must be exactly 'pain', 'request', or 'behavior'\n"
+        "   - description: string (one clear sentence)\n"
+        "   - source: must be exactly 'interviews', 'jira', or 'analytics'\n"
+        "   - intensity: integer between 1-5 (5 = most severe/important)\n\n"
+        "4. Do NOT return empty arrays []\n"
+        "5. Start your response with [ and end with ]\n"
+        "6. Extract EVERY distinct pain point, feature request, and behavior pattern\n\n"
+        "Analyze the following product management inputs and extract user signals:"
     )
     
     user_message = f"""# INTERVIEWS
@@ -162,11 +169,20 @@ def rank_features(signals: List[SignalItem]) -> List[FeatureRecommendation]:
         List of top 3 FeatureRecommendation objects
     """
     system_prompt = (
-        "You are a senior product manager. Given these product signals, identify exactly the top 3 features to build next. "
-        "Return ONLY valid JSON. The response must be a JSON array with exactly 3 elements. "
-        "Each element must have: feature_name (string), problem_it_solves (string), "
-        "supporting_evidence (array of strings, each a direct reference to a signal), "
-        "priority_score (integer 1-100), estimated_user_impact (one sentence string)."
+        "SYSTEM INSTRUCTION: You are a senior product manager. You MUST analyze the provided data and output exactly three high-priority features. Do NOT return empty lists.\n\n"
+        "CRITICAL REQUIREMENTS:\n"
+        "1. You MUST return valid JSON - no markdown, no code blocks, no explanations\n"
+        "2. The response MUST be a JSON array with EXACTLY 3 feature objects\n"
+        "3. Each object MUST have ALL these fields:\n"
+        "   - feature_name: string (clear, actionable feature name)\n"
+        "   - problem_it_solves: string (specific user problem)\n"
+        "   - supporting_evidence: array of strings (minimum 2 evidence points)\n"
+        "   - priority_score: integer between 1-100 (higher = more important)\n"
+        "   - estimated_user_impact: string (one sentence describing impact)\n\n"
+        "4. Do NOT return empty arrays []\n"
+        "5. Start your response with [ and end with ]\n"
+        "6. If signals are limited, synthesize features from available data\n\n"
+        "Given these product signals, identify exactly the top 3 features to build next:"
     )
     
     # Convert signals to JSON for the prompt
@@ -259,11 +275,17 @@ def generate_challenges(features: List[FeatureRecommendation]) -> List[Challenge
         List of Challenge objects
     """
     system_prompt = (
-        "You are a critical product reviewer whose job is to prevent bad product decisions. "
-        "For each of the following recommended features, generate exactly 2 specific reasons why it might be "
-        "the WRONG priority right now. Be specific — reference implementation complexity, market timing, "
-        "user behavior patterns, or evidence gaps. Return ONLY valid JSON array where each element has: "
-        "feature_name (string matching the input) and challenges (array of exactly 2 strings)."
+        "SYSTEM INSTRUCTION: You are a senior product manager identifying risks. You MUST generate challenges for each feature. Do NOT return empty lists.\n\n"
+        "CRITICAL REQUIREMENTS:\n"
+        "1. You MUST return valid JSON - no markdown, no code blocks, no explanations\n"
+        "2. The response MUST be a JSON array with one object per feature\n"
+        "3. Each object MUST have ALL these fields:\n"
+        "   - feature_name: string (must match the input feature name exactly)\n"
+        "   - challenges: array of exactly 2 strings (specific concerns)\n\n"
+        "4. Do NOT return empty arrays []\n"
+        "5. Start your response with [ and end with ]\n"
+        "6. Be specific about implementation complexity, market timing, user behavior, or evidence gaps\n\n"
+        "For each recommended feature, generate exactly 2 specific reasons why it might be the WRONG priority right now:"
     )
     
     # Convert features to JSON for the prompt
