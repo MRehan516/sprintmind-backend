@@ -1,0 +1,26 @@
+# Web Framework & Server
+fastapi
+uvicorn[standard]
+pydantic[email]
+pydantic-settings
+python-multipart
+
+# Database
+sqlalchemy
+psycopg2-binary
+
+# Utilities & Testing
+httpx
+pytest
+pytest-cov
+python-dotenv
+
+# Security
+bcrypt
+pyjwt
+
+# Logging
+loguru
+
+# AI & Research
+ibm-watsonx-ai
